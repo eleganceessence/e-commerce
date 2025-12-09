@@ -23,7 +23,7 @@ app.use(cors({ origin: FRONTEND, credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 
-app.get('/health', () => {
+app.get('/health', (req ,res) => {
   res.send('ok')
 })
 
