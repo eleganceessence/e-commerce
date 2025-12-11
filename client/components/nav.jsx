@@ -4,8 +4,8 @@ import Link from "next/link"
 
 export default function Nav() {
   return (
-    <div className="flex fixed w-full h-[50px] ">
-      <div>
+    <div className="flex fixed w-full h-[50px] justify-between items-center">
+      <div className="flex justify-between">
         <Link href="#">Store</Link>
         <Link href="#">About</Link>
         <Link href="#">Contact</Link>
@@ -15,7 +15,7 @@ export default function Nav() {
         Name
       </div>
       
-      <div>
+      <div className="flex justify-between">
         <Link href="#">Store</Link>
         <Link href="#">Store</Link>
       </div>
