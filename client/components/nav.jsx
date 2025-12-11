@@ -6,9 +6,9 @@ export default function Nav() {
   return (
     <div className="flex fixed w-full h-[50px] ">
       <div>
-        <Link>Store</Link>
-        <Link>About</Link>
-        <Link>Contact</Link>
+        <Link href="#">Store</Link>
+        <Link href="#">About</Link>
+        <Link href="#">Contact</Link>
       </div>
       
       <div>
@@ -16,8 +16,8 @@ export default function Nav() {
       </div>
       
       <div>
-        <Link>Store</Link>
-        <Link>Store</Link>
+        <Link href="#">Store</Link>
+        <Link href="#">Store</Link>
       </div>
     </div>
   )
