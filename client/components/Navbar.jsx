@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ShoppingBag, Menu, Search, User } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { SignInButton } from '@clerk/nextjs'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,9 +46,11 @@ export default function Navbar() {
           <button className="p-2 text-muted-foreground hover:text-primary transition-colors hidden sm:block">
             <Search className="h-5 w-5" />
           </button>
+          <SignInButton mode="modal">
           <button className="p-2 text-muted-foreground hover:text-primary transition-colors hidden sm:block">
             <User className="h-5 w-5" />
           </button>
+          </SignInButton>
           <button className="p-2 text-muted-foreground hover:text-primary transition-colors relative">
             <ShoppingBag className="h-5 w-5" />
             <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary ring-2 ring-background"></span>
