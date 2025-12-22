@@ -5,6 +5,8 @@ import SplashScreen from "@/components/SplashScreen.jsx";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,17 +30,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans selection:bg-primary/20 selection:text-primary`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SplashScreen />
-          <Navbar />
-          {children}
-          <Footer />
-        </ThemeProvider>
+        <UserProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SplashScreen />
+            <Navbar />
+            {children}
+            <Footer />
+          </ThemeProvider>
+        </UserProvider>
       </body>
     </html>
   );
