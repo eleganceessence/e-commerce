@@ -1,4 +1,5 @@
 'use client'
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import ProductCard from "./ProductCard";
@@ -37,11 +38,25 @@ export default function FeaturedProducts() {
                     <div className="w-20 h-1 bg-primary mx-auto"></div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {PRODUCTS.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, staggerChildren: 0.2 }}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-8"
+                >
+                    {PRODUCTS.map((product, index) => (
+                        <motion.div
+                            key={product.id}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: index * 0.1 }}
+                        >
+                            <ProductCard product={product} />
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
 
                 <div className="text-center mt-16">
                     <Link href="/shop" className="inline-block border-b border-foreground pb-1 uppercase tracking-widest text-sm hover:text-primary hover:border-primary transition-colors">

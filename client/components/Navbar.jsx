@@ -5,9 +5,11 @@ import { ShoppingBag, Menu, Search, User } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SignInButton } from '@clerk/nextjs'
+import { useCart } from "@/lib/cart-context";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { toggleCart, itemCount } = useCart();
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -47,13 +49,20 @@ export default function Navbar() {
             <Search className="h-5 w-5" />
           </button>
           <SignInButton mode="modal">
-          <button className="p-2 text-muted-foreground hover:text-primary transition-colors hidden sm:block">
-            <User className="h-5 w-5" />
-          </button>
+            <button className="p-2 text-muted-foreground hover:text-primary transition-colors hidden sm:block">
+              <User className="h-5 w-5" />
+            </button>
           </SignInButton>
-          <button className="p-2 text-muted-foreground hover:text-primary transition-colors relative">
+          <button
+            className="p-2 text-muted-foreground hover:text-primary transition-colors relative"
+            onClick={toggleCart}
+          >
             <ShoppingBag className="h-5 w-5" />
-            <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary ring-2 ring-background"></span>
+            {itemCount > 0 && (
+              <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center ring-2 ring-background">
+                {itemCount}
+              </span>
+            )}
           </button>
         </div>
       </div>

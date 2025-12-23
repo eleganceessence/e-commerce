@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Star } from "lucide-react";
+import { useCart } from "@/lib/cart-context";
 
 export default function ProductInfo({ product }) {
     const [quantity, setQuantity] = useState(1);
+    const { addItem } = useCart();
 
     const increment = () => setQuantity((p) => p + 1);
     const decrement = () => setQuantity((p) => (p > 1 ? p - 1 : 1));
@@ -61,7 +63,10 @@ export default function ProductInfo({ product }) {
                             <Plus className="h-4 w-4" />
                         </button>
                     </div>
-                    <Button className="flex-1 h-12 text-sm uppercase tracking-widest font-bold">
+                    <Button
+                        className="flex-1 h-12 text-sm uppercase tracking-widest font-bold"
+                        onClick={() => addItem(product, quantity)}
+                    >
                         Add to Cart - {product.price}
                     </Button>
                 </div>

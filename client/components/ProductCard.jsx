@@ -2,8 +2,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { useCart } from "@/lib/cart-context";
 
 export default function ProductCard({ product }) {
+    const { addItem } = useCart();
     return (
         <div className="group cursor-pointer">
             <Link href={`/shop/${product.id}`}>
@@ -21,7 +23,7 @@ export default function ProductCard({ product }) {
                         className="absolute bottom-4 right-4 bg-white text-black p-3 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-primary hover:text-white shadow-lg z-10"
                         onClick={(e) => {
                             e.preventDefault();
-                            // Add to cart logic would go here
+                            addItem(product, 1);
                         }}
                     >
                         <Plus className="h-5 w-5" />

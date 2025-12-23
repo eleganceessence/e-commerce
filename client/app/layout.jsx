@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 import {
   ClerkProvider,
 } from '@clerk/nextjs'
+import { CartProvider } from "@/lib/cart-context";
+import CartDrawer from "@/components/CartDrawer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,22 +30,26 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans selection:bg-primary/20 selection:text-primary`}
-      >
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans selection:bg-primary/20 selection:text-primary`}
+        >
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
-            <Navbar />
-            {children}
-            <Footer />
+            <CartProvider>
+              <SplashScreen />
+              <Navbar />
+              {children}
+              <Footer />
+              <CartDrawer />
+            </CartProvider>
           </ThemeProvider>
-      </body>
-    </html>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }
