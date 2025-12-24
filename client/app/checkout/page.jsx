@@ -5,24 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, CheckCircle2, CreditCard, Truck, Banknote, Smartphone } from "lucide-react";
+import { useCart } from '@/lib/cart-context';
 
-// Mock cart context for demo
-const mockCartItems = [
-  {
-    id: 1,
-    name: "Midnight Rose",
-    description: "Dark florals with amber undertones",
-    price: "$125.00",
-    quantity: 2
-  },
-  {
-    id: 2,
-    name: "Ocean Breeze",
-    description: "Fresh aquatic notes with citrus",
-    price: "$98.00",
-    quantity: 1
-  }
-];
 
 export default function CheckoutPage() {
   const [isOrdered, setIsOrdered] = useState(false);
@@ -33,30 +17,33 @@ export default function CheckoutPage() {
   const [cvv, setCvv] = useState("");
   const [cardName, setCardName] = useState("");
   const [upiId, setUpiId] = useState("");
-
-  const cartItems = mockCartItems;
-  const subtotal = 348.00;
+  const {
+    cartItems,
+    clearCart,
+    subtotal,
+  } = useCart();
+  
   const shipping = 15.0;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
-
+  
   const formatCardNumber = (value) => {
     const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
     const matches = v.match(/\d{4,16}/g);
     const match = (matches && matches[0]) || "";
     const parts = [];
-
+    
     for (let i = 0; i < match.length; i += 4) {
       parts.push(match.substring(i, i + 4));
     }
-
+    
     if (parts.length) {
       return parts.join(" ");
     } else {
       return value;
     }
   };
-
+  
   const formatExpiryDate = (value) => {
     const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
     if (v.length >= 2) {
@@ -64,37 +51,39 @@ export default function CheckoutPage() {
     }
     return v;
   };
-
+  
   const handleCardNumberChange = (e) => {
     const formatted = formatCardNumber(e.target.value);
     if (formatted.replace(/\s/g, "").length <= 16) {
       setCardNumber(formatted);
     }
   };
-
+  
   const handleExpiryChange = (e) => {
     const formatted = formatExpiryDate(e.target.value);
     if (formatted.replace(/\//g, "").length <= 4) {
       setExpiryDate(formatted);
     }
   };
-
+  
   const handleCvvChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/gi, "");
     if (value.length <= 4) {
       setCvv(value);
     }
   };
-
+  
   const handlePlaceOrder = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
     setTimeout(() => {
       setIsSubmitting(false);
       setIsOrdered(true);
+      clearCart();
     }, 2000);
   };
-
+  
   if (isOrdered) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4">
@@ -113,9 +102,9 @@ export default function CheckoutPage() {
       </div>
     );
   }
-
+  
   return (
-    <main className="py-12 md:py-20 lg:py-24 bg-gray-50">
+    <main className="py-12 md:py-20 lg:py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-16">
           <div className="flex-1 space-y-12">
