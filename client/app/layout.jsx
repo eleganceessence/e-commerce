@@ -31,6 +31,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
+        <head>
+          <meta name="google-site-verification" content="XAJANY0xQmGXtnRnHess90DNx3IogphUtTQk-0_LmT4" />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans selection:bg-primary/20 selection:text-primary`}
         >
