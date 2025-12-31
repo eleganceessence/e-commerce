@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,24 +12,29 @@ import {
   Truck,
   Banknote,
   Smartphone,
-  MapPin
+  MapPin,
+  User
 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 
 export default function CheckoutPage() {
+  const { user, isLoaded } = useUser();
+
   const [isOrdered, setIsOrdered] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("card");
   const [isLocating, setIsLocating] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("card");
 
-  // Payment fields
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [upiId, setUpiId] = useState("");
+  /* ======================
+     👤 PERSONAL INFO
+     ====================== */
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
 
-  // Address fields
+  /* ======================
+     📍 ADDRESS
+     ====================== */
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
@@ -39,6 +45,17 @@ export default function CheckoutPage() {
   const shipping = 15;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
+
+  /* ======================
+     🔐 LOAD DATA FROM CLERK
+     ====================== */
+  useEffect(() => {
+    if (isLoaded && user) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+      setEmail(user.primaryEmailAddress?.emailAddress || "");
+    }
+  }, [isLoaded, user]);
 
   /* ======================
      📍 GET CURRENT LOCATION
@@ -52,23 +69,19 @@ export default function CheckoutPage() {
     setIsLocating(true);
 
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-
+      async ({ coords }) => {
         try {
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}`
           );
           const data = await res.json();
           const a = data.address || {};
 
-          setAddress(
-            `${a.house_number || ""} ${a.road || ""}`.trim()
-          );
+          setAddress(`${a.house_number || ""} ${a.road || ""}`.trim());
           setCity(a.city || a.town || a.village || "");
           setState(a.state || "");
           setZip(a.postcode || "");
-        } catch (err) {
+        } catch {
           alert("Failed to fetch address");
         } finally {
           setIsLocating(false);
@@ -81,10 +94,8 @@ export default function CheckoutPage() {
     );
   };
 
-  const handlePlaceOrder = (e) => {
-    e.preventDefault();
+  const handlePlaceOrder = () => {
     setIsSubmitting(true);
-
     setTimeout(() => {
       setIsSubmitting(false);
       setIsOrdered(true);
@@ -94,11 +105,11 @@ export default function CheckoutPage() {
 
   if (isOrdered) {
     return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center text-center">
+      <div className="min-h-[80vh] flex flex-col items-center justify-center">
         <CheckCircle2 className="h-20 w-20 text-emerald-600 mb-6" />
-        <h1 className="text-4xl font-serif mb-4">Order Placed 🎉</h1>
-        <p className="text-muted-foreground max-w-md">
-          Your order is confirmed. Check your email for details.
+        <h1 className="text-4xl font-serif mb-3">Order Confirmed 🎉</h1>
+        <p className="text-muted-foreground">
+          Confirmation sent to <b>{email}</b>
         </p>
       </div>
     );
@@ -107,13 +118,37 @@ export default function CheckoutPage() {
   return (
     <main className="py-16 bg-background">
       <div className="container mx-auto px-4 flex flex-col lg:flex-row gap-16">
+
         {/* LEFT */}
         <div className="flex-1 space-y-12">
           <h1 className="text-3xl font-serif flex items-center gap-2">
             <ChevronLeft className="h-4 w-4" /> Checkout
           </h1>
 
-          {/* SHIPPING */}
+          {/* 👤 PERSONAL INFO */}
+          <section className="space-y-6">
+            <h2 className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+              <User className="h-4 w-4" /> Personal Information
+            </h2>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>First Name</Label>
+                <Input value={firstName} readOnly />
+              </div>
+              <div>
+                <Label>Last Name</Label>
+                <Input value={lastName} readOnly />
+              </div>
+            </div>
+
+            <div>
+              <Label>Email</Label>
+              <Input value={email} readOnly />
+            </div>
+          </section>
+
+          {/* 📍 SHIPPING */}
           <section className="space-y-6">
             <h2 className="text-sm font-bold uppercase tracking-widest">
               Shipping Address
@@ -127,33 +162,18 @@ export default function CheckoutPage() {
               className="flex gap-2 text-xs uppercase tracking-widest"
             >
               <MapPin className="h-4 w-4" />
-              {isLocating ? "Detecting Location..." : "Use My Current Location"}
+              {isLocating ? "Detecting..." : "Use My Location"}
             </Button>
 
-            <div className="space-y-4">
-              <div>
-                <Label>Address</Label>
-                <Input value={address} onChange={(e) => setAddress(e.target.value)} />
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label>City</Label>
-                  <Input value={city} onChange={(e) => setCity(e.target.value)} />
-                </div>
-                <div>
-                  <Label>State</Label>
-                  <Input value={state} onChange={(e) => setState(e.target.value)} />
-                </div>
-                <div>
-                  <Label>ZIP</Label>
-                  <Input value={zip} onChange={(e) => setZip(e.target.value)} />
-                </div>
-              </div>
+            <Input placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
+            <div className="grid grid-cols-3 gap-4">
+              <Input placeholder="City" value={city} onChange={(e) => setCity(e.target.value)} />
+              <Input placeholder="State" value={state} onChange={(e) => setState(e.target.value)} />
+              <Input placeholder="ZIP" value={zip} onChange={(e) => setZip(e.target.value)} />
             </div>
           </section>
 
-          {/* PAYMENT */}
+          {/* 💳 PAYMENT */}
           <section className="space-y-6">
             <h2 className="text-sm font-bold uppercase tracking-widest">
               Payment Method
@@ -197,32 +217,22 @@ export default function CheckoutPage() {
               Order Summary
             </h2>
 
-            <div className="space-y-4">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex justify-between">
-                  <span>{item.name} × {item.quantity}</span>
-                  <span>{item.price}</span>
-                </div>
-              ))}
-            </div>
+            {cartItems.map((item) => (
+              <div key={item.id} className="flex justify-between text-sm">
+                <span>{item.name} × {item.quantity}</span>
+                <span>{item.price}</span>
+              </div>
+            ))}
 
-            <div className="border-t mt-6 pt-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping</span>
-                <span>${shipping.toFixed(2)}</span>
-              </div>
+            <div className="border-t mt-6 pt-4 space-y-2">
+              <div className="flex justify-between"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
               <div className="flex justify-between font-bold text-lg">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>Total</span><span>${total.toFixed(2)}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2 mt-6 text-xs uppercase text-muted-foreground">
-              <Truck className="h-4 w-4" /> Fast delivery guaranteed
+              <Truck className="h-4 w-4" /> Fast delivery
             </div>
           </div>
         </aside>
