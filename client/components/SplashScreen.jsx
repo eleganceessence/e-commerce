@@ -1,6 +1,7 @@
 "use client";
 
-import gsap from "gsap";
+
+import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useState, useRef, useEffect } from "react";
 
@@ -31,21 +32,14 @@ export default function SplashScreen() {
 
   useGSAP(
     (context) => {
+      // Guard clause to prevent animation from running before particles are generated
+      if (particles.length === 0) {
+        return;
+      }
+
       const tl = gsap.timeline({
         onComplete: () => setTimeout(() => setHide(true), 400),
       });
-
-      gsap.set(
-        [
-          brandRef.current,
-          subBrandRef.current,
-          taglineRef.current,
-          flameRingRef.current,
-          ".particle",
-          ".letter",
-        ],
-        { clearProps: "all" }
-      );
 
       gsap.set(brandRef.current, {
         scale: 0.3,
@@ -142,7 +136,7 @@ export default function SplashScreen() {
         });
       });
     },
-    { scope: containerRef }
+    { scope: containerRef, dependencies: [particles], revertOnUpdate: true }
   );
 
   if (hide) return null;
