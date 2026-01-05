@@ -21,8 +21,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Elegance Essence | Luxury Fragrances",
-  description: "Discover your signature scent with Elegance Essence.",
+  title: "Blaze exiliar | Luxury Fragrances",
+  description: "Discover your signature scent with Blaze exiliar.",
 };
 
 export default function RootLayout({

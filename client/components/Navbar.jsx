@@ -26,7 +26,7 @@ export default function Navbar() {
         {/* Logo */}
         <div className="flex-shrink-0 md:flex-1 md:text-center flex justify-center w-full md:w-auto">
           <Link href="/" className="font-serif text-2xl md:text-3xl tracking-widest font-bold text-foreground hover:text-primary transition-colors">
-            ELEGANCE
+            Blaze exiliar
           </Link>
         </div>
 

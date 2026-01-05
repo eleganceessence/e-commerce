@@ -19,19 +19,19 @@ import { useCart } from "@/lib/cart-context";
 
 export default function CheckoutPage() {
   const { user, isLoaded } = useUser();
-
+  
   const [isOrdered, setIsOrdered] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
-
+  
   /* ======================
      👤 PERSONAL INFO
      ====================== */
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-
+  
   /* ======================
      📍 ADDRESS
      ====================== */
@@ -39,13 +39,13 @@ export default function CheckoutPage() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [zip, setZip] = useState("");
-
+  
   const { cartItems, clearCart, subtotal } = useCart();
-
+  
   const shipping = 15;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
-
+  
   /* ======================
      🔐 LOAD DATA FROM CLERK
      ====================== */
@@ -56,7 +56,7 @@ export default function CheckoutPage() {
       setEmail(user.primaryEmailAddress?.emailAddress || "");
     }
   }, [isLoaded, user]);
-
+  
   /* ======================
      📍 GET CURRENT LOCATION
      ====================== */
@@ -65,35 +65,40 @@ export default function CheckoutPage() {
       alert("Geolocation not supported");
       return;
     }
-
+    
     setIsLocating(true);
-
+    
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}`
-          );
-          const data = await res.json();
-          const a = data.address || {};
-
-          setAddress(`${a.house_number || ""} ${a.road || ""}`.trim());
-          setCity(a.city || a.town || a.village || "");
-          setState(a.state || "");
-          setZip(a.postcode || "");
-        } catch {
-          alert("Failed to fetch address");
-        } finally {
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}`
+            );
+            const data = await res.json();
+            const a = data.address || {};
+            
+            setAddress(`${a.house_number || ""} ${a.road || ""}`.trim());
+            setCity(a.city || a.town || a.village || "");
+            setState(a.state || "");
+            setZip(a.postcode || "");
+          } catch {
+            alert("Failed to fetch address");
+          } finally {
+            setIsLocating(false);
+          }
+        },
+        () => {
+          alert("Location permission denied");
           setIsLocating(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
         }
-      },
-      () => {
-        alert("Location permission denied");
-        setIsLocating(false);
-      }
     );
   };
-
+  
   const handlePlaceOrder = () => {
     setIsSubmitting(true);
     setTimeout(() => {
@@ -102,7 +107,7 @@ export default function CheckoutPage() {
       clearCart();
     }, 2000);
   };
-
+  
   if (isOrdered) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center">
@@ -114,7 +119,7 @@ export default function CheckoutPage() {
       </div>
     );
   }
-
+  
   return (
     <main className="py-16 bg-background">
       <div className="container mx-auto px-4 flex flex-col lg:flex-row gap-16">
